@@ -1,26 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useCallback } from 'react';
 import './App.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUsersRequest } from './requests/requests';
+import { getUsers } from './selectors/userSelectors';
+import UserRow from './UserRow';
+import { setSelectedUser } from './actionCreators/actionCreators';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const dispatch = useDispatch();
+	const users = useSelector(getUsers)
+	const handleClickCheckbox = useCallback((id) => {
+		dispatch(setSelectedUser(id))
+	}, [dispatch]);
+
+	useEffect(() => {
+		dispatch(getUsersRequest());
+	}, [dispatch]);
+
+	return (
+		<table>
+			<thead>
+				<tr>
+					<th>
+						Photo
+					</th>
+					<th style={{textAlign: 'left'}}>
+						Name
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				{users.length ? users.map((user) => (
+					<UserRow user={user} key={user.login.uuid} handleClickCheckbox={handleClickCheckbox} />
+				)) : null}
+			</tbody>
+		</table>
+	);
 }
 
 export default App;
